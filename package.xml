@@ -3,7 +3,7 @@
 <package format="3">
   <name>mr_pkg</name>
   <version>0.0.0</version>
-  <description>A Mixed Reality Package</description>
+  <description>A Mixed Reality ROS2 Package</description>
   <maintainer email="oakley.j.thomas@gmail.com">Oakley Thomas</maintainer>
   <license>Apache-2.0</license>
 

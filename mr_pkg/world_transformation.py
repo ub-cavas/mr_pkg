@@ -51,6 +51,7 @@ class WorldTransformation(Node):
                                                self.world_origin_gnss.latitude, self.world_origin_gnss.longitude, self.world_origin_gnss.altitude)
 
     def send_vehicle_world_odometry(self):
+        #TODO: assign the odometry message
         msg = Odometry()
         self.ego_vehicle_publisher.publish(msg)
          
@@ -150,7 +151,7 @@ def world_to_gnss(x: float, y: float, z: float, origin_lat: float, origin_lon: f
     xe, ye, ze = enu_to_ecef(e, n, u, origin_lat, origin_lon, origin_alt)
     return ecef_to_latlon(xe, ye, ze)
 
-
+# ------------ Engine ------------------
 def main(args=None):
     print("Starting World_Transform Node")
     rclpy.init(args=args)

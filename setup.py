@@ -14,12 +14,13 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='oakley',
-    maintainer_email='oakley@todo.todo',
-    description='TODO: Package description',
+    maintainer_email='oakley.j.thomas@gmail.com',
+    description='A Mixed Reality ROS2 Package',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'world_transform = mr_pkg.world_transformation:main'
         ],
     },
 )
