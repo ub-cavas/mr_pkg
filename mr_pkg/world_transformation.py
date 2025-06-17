@@ -3,7 +3,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import NavSatFix
-from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import Point
 from nav_msgs.msg import Odometry
 from math import sin, cos, sqrt, radians, atan2, degrees
 
@@ -15,10 +15,10 @@ _EP2  = (_A**2 - _B**2) / _B**2  # second eccentricity squared
 
 class WorldTransformation(Node):
     def __init__(self):
-        super().__init__('world_transformation')
+        super().__init__('World_Transformation')
         self.world_origin_gnss = None
         self.ego_vehicle_gnss = None
-        self.ego_vehicle_world = Vector3()
+        self.ego_vehicle_world = Point(x=float(0),y=float(0),z=float(0))
 
         # TODO: convert this into a service instead of a sub
         self.world_origin_subscriber = self.create_subscription(
@@ -33,13 +33,12 @@ class WorldTransformation(Node):
             self.on_ego_vehicle_received,
             10)
         
-        self.ego_vehicle_publisher = self.create_publisher(Odometry, 'ego_vehicle_world', 10)
+        self.ego_vehicle_publisher = self.create_publisher(Odometry, 'world_transform', 10)
         rate = 0.05 # 20 Hz
         self.timer = self.create_timer(rate, self.send_vehicle_world_odometry)
 
     # ----------- ROS2 Callbacks------------------
     def on_world_origin_received(self, msg: NavSatFix):
-        print("Recieved world origin!")
         self.world_origin_gnss = msg
 
     
@@ -49,10 +48,16 @@ class WorldTransformation(Node):
         if self.world_origin_gnss is not None:
             self.ego_vehicle_world.x, self.ego_vehicle_world.y, self.ego_vehicle_world.z = gnss_to_world(msg.latitude, msg.longitude, msg.altitude,
                                                self.world_origin_gnss.latitude, self.world_origin_gnss.longitude, self.world_origin_gnss.altitude)
+            print("World Position: ",self.ego_vehicle_world.x, self.ego_vehicle_world.y, self.ego_vehicle_world.z)
+            
 
     def send_vehicle_world_odometry(self):
-        #TODO: assign the odometry message
+        print("Sending World Transform")
         msg = Odometry()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.header.frame_id = 'odom'           # world frame
+        msg.child_frame_id = 'base_link'       # robot frame
+        msg.pose.pose.position = self.ego_vehicle_world
         self.ego_vehicle_publisher.publish(msg)
          
 # ----------- Conversions ------------------
