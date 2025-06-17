@@ -52,7 +52,6 @@ class WorldTransformation(Node):
             
 
     def send_vehicle_world_odometry(self):
-        print("Sending World Transform")
         msg = Odometry()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = 'odom'           # world frame
