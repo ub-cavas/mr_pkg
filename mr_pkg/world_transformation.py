@@ -1,11 +1,10 @@
-#mr_pkg/mr_pkg/world_transformation.py
-
 import rclpy
 import math
 from rclpy.node import Node
 from sensor_msgs.msg import NavSatFix
 from geometry_msgs.msg import Point
 from nav_msgs.msg import Odometry
+
 
 
 # WGS84 ellipsoid constants

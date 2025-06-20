@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'world_transform = mr_pkg.world_transformation:main'
+            'virtual_perception = mr_pkg.virtual_perception:main'
         ],
     },
 )
