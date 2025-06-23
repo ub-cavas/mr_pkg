@@ -28,7 +28,7 @@ class WorldTransformation(Node):
         
         self.ego_vehicle_subscriber = self.create_subscription(
             NavSatFix, 
-            '/vehicle/gps/fix', 
+            '/novatel/oem7/fix', 
             self.on_ego_vehicle_received,
             10)
         
