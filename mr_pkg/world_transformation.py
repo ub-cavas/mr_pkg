@@ -17,7 +17,8 @@ class WorldTransformation(Node):
         super().__init__('World_Transformation')
         self.world_origin_gnss = None
         self.ego_vehicle_gnss = None
-        self.ego_vehicle_world = Point(x=float(0),y=float(0),z=float(0))
+        self.ego_vehicle_odom = Odometry()
+        self.ego_vehicle_world = Odometry()
 
         # TODO: convert this into a service instead of a sub
         self.world_origin_subscriber = self.create_subscription(
@@ -29,7 +30,13 @@ class WorldTransformation(Node):
         self.ego_vehicle_subscriber = self.create_subscription(
             NavSatFix, 
             '/novatel/oem7/fix', 
-            self.on_ego_vehicle_received,
+            self.on_ego_vehicle_nav_received,
+            10)
+        
+        self.ego_vehicle_odom_subscriber = self.create_subscription(
+            Odometry, 
+            '/novatel/oem7/odom', 
+            self.on_ego_vehicle_odom_received,
             10)
         
         self.ego_vehicle_publisher = self.create_publisher(Odometry, 'world_transform', 10)
@@ -41,21 +48,34 @@ class WorldTransformation(Node):
         self.world_origin_gnss = msg
 
     
-    def on_ego_vehicle_received(self, msg: NavSatFix):
+    def on_ego_vehicle_nav_received(self, msg: NavSatFix):
         print("Recieved Ego Vehicle GNSS!")
         self.ego_vehicle_gnss = msg
         if self.world_origin_gnss is not None:
-            self.ego_vehicle_world.x, self.ego_vehicle_world.y, self.ego_vehicle_world.z = gnss_to_world(msg.latitude, msg.longitude, msg.altitude,
-                                               self.world_origin_gnss.latitude, self.world_origin_gnss.longitude, self.world_origin_gnss.altitude)
-            print("World Position: ",self.ego_vehicle_world.x, self.ego_vehicle_world.y, self.ego_vehicle_world.z)
-            
+            x,y,z = gnss_to_world(msg.latitude, msg.longitude, msg.altitude, self.world_origin_gnss.latitude, self.world_origin_gnss.longitude, self.world_origin_gnss.altitude)
+            # World Position
+            self.ego_vehicle_world.pose.pose.position.x = x
+            self.ego_vehicle_world.pose.pose.position.y = y
+            self.ego_vehicle_world.pose.pose.position.z = z
+
+
+    def on_ego_vehicle_odom_received(self, msg: Odometry):
+        print("Received vehicle odometry!") 
+        print(msg.header.frame_id)    
+        self.ego_vehicle_odom = msg
+        
 
     def send_vehicle_world_odometry(self):
         msg = Odometry()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = 'odom'           # world frame
         msg.child_frame_id = 'base_link'       # robot frame
-        msg.pose.pose.position = self.ego_vehicle_world
+        # Pose
+        msg.pose.pose.position = self.ego_vehicle_world.pose.pose.position
+        msg.pose.pose.orientation = self.ego_vehicle_odom.pose.pose.orientation
+        # Twist
+        msg.twist.twist.linear = self.ego_vehicle_odom.twist.twist.linear
+        #msg.twist.twist.angular = self.ego_vehicle_odom.twist.twist.angular
         self.ego_vehicle_publisher.publish(msg)
          
 # ----------- Conversions ------------------
