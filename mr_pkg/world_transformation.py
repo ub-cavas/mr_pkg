@@ -75,7 +75,7 @@ class WorldTransformation(Node):
         msg.pose.pose.orientation = self.ego_vehicle_odom.pose.pose.orientation
         # Twist
         msg.twist.twist.linear = self.ego_vehicle_odom.twist.twist.linear
-        #msg.twist.twist.angular = self.ego_vehicle_odom.twist.twist.angular
+        msg.twist.twist.angular = self.ego_vehicle_odom.twist.twist.angular
         self.ego_vehicle_publisher.publish(msg)
          
 # ----------- Conversions ------------------
