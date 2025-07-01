@@ -18,9 +18,15 @@ git clone https://github.com/ub-cavas/UB-MR.git
 TODO
 
 # ENABLE MIXED REALITY
-# Source ROS 2 and the workspace (WSL2 Ubuntu 22.05.5 LTS)
+# Build the ros2 package (only required when package is updated)
+cd ros2_ws/src
+colcon build
 
-source ros2_ws/src/mr_pkg/install/setup.bash
+
+# Source ROS 2 and the workspace (WSL2 Ubuntu 22.05.5 LTS)
+source /opt/ros/humble/setup.bash
+cd ..
+source install/setup.bash
 
 # Run Mixed Reality Package (all nodes) in one terminal (WSL2 Ubuntu 22.05.5 LTS)
 ros2 run mr_pkg world_transform
