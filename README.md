@@ -10,22 +10,25 @@ https://docs.ros.org/en/humble/Installation/Alternatives/Ubuntu-Development-Setu
 # Clone this package into a ros2 workspace (WSL2 Ubuntu 22.05.5 LTS)
 git clone https://github.com/ub-cavas/mr_pkg.git
 
-# Clone the engine source code (Windows 11)
+# Clone the engine + source code (Windows 11)
+1.) Install Unity HUB: https://unity.com/download
+2.) Open Unity HUB
+3.) Install Unity 6000.0.36f1 Editor from the Unity HUB
+4.) Install the Mixed Reality Engine
 link to repo: https://github.com/ub-cavas/UB-MR
 git clone https://github.com/ub-cavas/UB-MR.git
+
 
 # Clone the engine (binaries)
 TODO
 
 # ENABLE MIXED REALITY
 # Build the ros2 package (only required when package is updated)
-cd ros2_ws/src
+cd ros2_ws
 colcon build
-
 
 # Source ROS 2 and the workspace (WSL2 Ubuntu 22.05.5 LTS)
 source /opt/ros/humble/setup.bash
-cd ..
 source install/setup.bash
 
 # Run Mixed Reality Package (all nodes) in one terminal (WSL2 Ubuntu 22.05.5 LTS)
