@@ -29,7 +29,7 @@ class WorldTransformation(Node):
         
         self.ego_vehicle_subscriber = self.create_subscription(
             NavSatFix, 
-            '/vehicle/gps/fix', 
+            '/novatel/oem7/fix', 
             self.on_ego_vehicle_nav_received,
             10)
         
@@ -40,7 +40,7 @@ class WorldTransformation(Node):
             10)
         
         self.ego_vehicle_publisher = self.create_publisher(Odometry, 'world_transform', 10)
-        rate = 0.02 # 50 Hz
+        rate = 0.5 # 2 Hz
         self.timer = self.create_timer(rate, self.send_vehicle_world_odometry)
 
     # ----------- ROS2 Callbacks------------------
