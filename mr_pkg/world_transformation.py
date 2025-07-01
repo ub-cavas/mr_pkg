@@ -49,7 +49,6 @@ class WorldTransformation(Node):
 
     
     def on_ego_vehicle_nav_received(self, msg: NavSatFix):
-        print("Recieved Ego Vehicle GNSS!")
         self.ego_vehicle_gnss = msg
         if self.world_origin_gnss is not None:
             x,y,z = gnss_to_world(msg.latitude, msg.longitude, msg.altitude, self.world_origin_gnss.latitude, self.world_origin_gnss.longitude, self.world_origin_gnss.altitude)
@@ -59,13 +58,12 @@ class WorldTransformation(Node):
             self.ego_vehicle_world.pose.pose.position.z = z
 
 
-    def on_ego_vehicle_odom_received(self, msg: Odometry):
-        print("Received vehicle odometry!") 
-        print(msg.header.frame_id)    
+    def on_ego_vehicle_odom_received(self, msg: Odometry):   
         self.ego_vehicle_odom = msg
         
 
     def send_vehicle_world_odometry(self):
+        print("Syncing to Ego-Vehicle")
         msg = Odometry()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = 'odom'           # world frame

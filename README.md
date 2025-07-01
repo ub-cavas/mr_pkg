@@ -45,3 +45,5 @@ ros2 bag play {path-to-rosbag} --start-offset 200
 
 # Run Engine (Windows 11)
 Run UB-MR.exe
+or 
+Play the service_center_loop scene from the Unity Editor
