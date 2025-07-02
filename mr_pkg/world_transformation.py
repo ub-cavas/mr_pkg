@@ -39,7 +39,7 @@ class WorldTransformation(Node):
             self.on_ego_vehicle_odom_received,
             10)
         
-        self.ego_vehicle_publisher = self.create_publisher(Odometry, 'world_transform', 10)
+        self.ego_vehicle_publisher = self.create_publisher(Odometry, '/world_transform', 10)
         rate = 0.02 # 50 Hz
         self.timer = self.create_timer(rate, self.send_vehicle_world_odometry)
 
@@ -58,8 +58,7 @@ class WorldTransformation(Node):
             self.ego_vehicle_world.pose.pose.position.z = z
 
 
-    def on_ego_vehicle_odom_received(self, msg: Odometry): 
-        print(msg.header.frame_id)    
+    def on_ego_vehicle_odom_received(self, msg: Odometry):     
         self.ego_vehicle_odom = msg
         
 
