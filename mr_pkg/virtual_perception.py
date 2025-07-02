@@ -7,7 +7,7 @@ class VirtualPerception(Node):
         super().__init__('Virtual_Perception')
         self.virtual_object_subscriber = self.create_subscription(
             BoundingBox3DArray,
-            'virtual_obstacles',
+            '/virtual_obstacles',
             self.on_virtual_obstacles_recieved,
             10)
         
