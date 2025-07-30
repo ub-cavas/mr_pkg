@@ -8,7 +8,7 @@ class WebcamPublisher(Node):
     def __init__(self):
         super().__init__('webcam_publisher')
         self.publisher_ = self.create_publisher(Image, 'webcam/image_raw', 10)
-        self.timer = self.create_timer(0.05, self.timer_callback)  # 20 Hz
+        self.timer = self.create_timer(0.0333, self.timer_callback)  # 30 Hz
         self.cap = cv2.VideoCapture(0)
         self.bridge = CvBridge()
 

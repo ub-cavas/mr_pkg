@@ -18,7 +18,7 @@ class ImageOverlayNode(Node):
         self.raw_sub = self.create_subscription(Image, '/webcam/image_raw', self.raw_callback, 10)
         self.compressed_sub = self.create_subscription(CompressedImage, '/virtual_camera/image_raw/compressed', self.compressed_callback, 10)
 
-        self.pub = self.create_publisher(Image, '/super_merge', 10)
+        self.pub = self.create_publisher(Image, '/super_merge', 30)
 
     def raw_callback(self, msg):
         try:
@@ -42,11 +42,31 @@ class ImageOverlayNode(Node):
         # Resize overlay to match base image size
         overlay_resized = cv2.resize(self.compressed_image, (self.raw_image.shape[1], self.raw_image.shape[0]))
 
-        # Overlay images (50% transparency)
-        blended = cv2.addWeighted(self.raw_image, 0.7, overlay_resized, 0.3, 0)
+        # Calculate "blackness" threshold (tune this as needed)
+        black_threshold = 30  # max value of RGB channels to still count as "black"
+
+        # Create mask of near-black pixels
+        mask_near_black = cv2.inRange(overlay_resized, (0, 0, 0), (black_threshold, black_threshold, black_threshold))
+        alpha = cv2.bitwise_not(mask_near_black)  # Invert: black -> 0 alpha, others -> 255
+
+        # Convert overlay to BGRA and set alpha
+        overlay_bgra = cv2.cvtColor(overlay_resized, cv2.COLOR_BGR2BGRA)
+        overlay_bgra[:, :, 3] = alpha
+
+        # Convert base image to BGRA
+        base_bgra = cv2.cvtColor(self.raw_image, cv2.COLOR_BGR2BGRA)
+
+        # Blend using alpha mask
+        blended = base_bgra.copy()
+        mask = alpha > 0
+        for c in range(3):  # B, G, R channels
+            blended[:, :, c][mask] = overlay_bgra[:, :, c][mask]
+
+        # Convert back to BGR for publishing
+        blended_bgr = cv2.cvtColor(blended, cv2.COLOR_BGRA2BGR)
 
         try:
-            msg = self.bridge.cv2_to_imgmsg(blended, encoding='bgr8')
+            msg = self.bridge.cv2_to_imgmsg(blended_bgr, encoding='bgr8')
             self.pub.publish(msg)
         except CvBridgeError as e:
             self.get_logger().error(f'Failed to convert and publish: {e}')
