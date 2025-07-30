@@ -13,6 +13,7 @@ ekf_filter_node_odom:
     odom_frame: odom
     base_link_frame: base_link
     world_frame: odom
+    publish_tf: true         
     
     # For mixed reality, we primarily care about GPS position
     # Adjust these based on your vehicle's actual sensors
@@ -62,7 +63,7 @@ ekf_filter_node_map:
     odom0_relative: false
     
     # Fused odometry from ekf_filter_node_odom
-    odom1: /odometry/filtered
+    odom1: /odometry/local
     odom1_config: [false, false, false,
                    false, false, false,
                    true,  true,  true,   # vx, vy, vz

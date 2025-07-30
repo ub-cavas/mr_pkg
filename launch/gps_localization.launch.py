@@ -33,7 +33,7 @@ def generate_launch_description():
             executable='ekf_node',
             name='ekf_filter_node_odom',
             output='screen',
-            parameters=[ekf_config],
+            parameters=[ekf_config, {'use_sim_time': use_sim_time}],
             remappings=[('odometry/filtered', 'odometry/local')]
         ),
         
@@ -43,7 +43,7 @@ def generate_launch_description():
             executable='ekf_node', 
             name='ekf_filter_node_map',
             output='screen',
-            parameters=[ekf_config],
+            parameters=[ekf_config, {'use_sim_time': use_sim_time}],
             remappings=[('odometry/filtered', 'odometry/global')]
         ),
         
@@ -53,11 +53,11 @@ def generate_launch_description():
             executable='navsat_transform_node',
             name='navsat_transform',
             output='screen',
-            parameters=[navsat_config],
+            parameters=[navsat_config, {'use_sim_time': use_sim_time}],
             remappings=[
                 ('imu/data', '/novatel/oem7/imu/data'),
                 ('gps/fix', '/novatel/oem7/fix'),
-                ('odometry/filtered', 'odometry/global')
+                ('odometry/filtered', 'odometry/local')
             ]
         )
     ])
