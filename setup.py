@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'world_transform = mr_pkg.world_transformation:main',
-            'virtual_perception = mr_pkg.virtual_perception:main'
+            'virtual_perception = mr_pkg.virtual_perception:main',
+            'webcam_publisher = mr_pkg.webcam_publisher:main'
         ],
     },
 )
