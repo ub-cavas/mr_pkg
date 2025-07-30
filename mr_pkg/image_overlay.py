@@ -18,7 +18,7 @@ class ImageOverlayNode(Node):
         self.raw_sub = self.create_subscription(Image, '/webcam/image_raw', self.raw_callback, 10)
         self.compressed_sub = self.create_subscription(CompressedImage, '/virtual_camera/image_raw/compressed', self.compressed_callback, 10)
 
-        self.pub = self.create_publisher(Image, '/super_merge', 30)
+        self.pub = self.create_publisher(Image, '/mixed_reality/camera', 30)
 
     def raw_callback(self, msg):
         try:
