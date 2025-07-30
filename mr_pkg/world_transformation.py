@@ -57,6 +57,8 @@ class WorldTransformation(Node):
         unity_pose.pose.pose.position.x = msg.pose.pose.position.x
         unity_pose.pose.pose.position.y = msg.pose.pose.position.z  # Up
         unity_pose.pose.pose.position.z = msg.pose.pose.position.y  # Forward
+        print(f'Position: x={unity_pose.pose.pose.position.x:.3f}, y={unity_pose.pose.pose.position.y:.3f}, z={unity_pose.pose.pose.position.z:.3f}')
+        
         
         # Copy orientation (may need adjustment based on vehicle frame)
         unity_pose.pose.pose.orientation = msg.pose.pose.orientation

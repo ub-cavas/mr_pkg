@@ -55,8 +55,8 @@ def generate_launch_description():
             output='screen',
             parameters=[navsat_config],
             remappings=[
-                ('imu/data', '/vehicle/imu'),
-                ('gps/fix', '/vehicle/gps/fix'),
+                ('imu/data', '/novatel/oem7/imu/data'),
+                ('gps/fix', '/novatel/oem7/fix'),
                 ('odometry/filtered', 'odometry/global')
             ]
         )
