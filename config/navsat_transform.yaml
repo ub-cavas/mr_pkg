@@ -1,0 +1,14 @@
+navsat_transform:
+  ros__parameters:
+    frequency: 30.0
+    delay: 0.0
+    magnetic_declination_radians: 0.0  # Set for your location
+    yaw_offset: 0.0  # Additional heading offset if needed
+    zero_altitude: true  # Set to false if altitude is important
+    broadcast_utm_transform: true
+    publish_filtered_gps: true
+    use_odometry_yaw: false  # Set true if IMU provides good heading
+    wait_for_datum: false  # Set true to wait for manual datum
+    
+    # Datum configuration (optional - can be auto-set from first GPS fix)
+    # datum: [lat, lon, alt, heading]  # Example: [42.3601, -71.0942, 0.0, 0.0]
