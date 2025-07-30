@@ -16,7 +16,7 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='oakley',
+    maintainer='oakley thomas',
     maintainer_email='oakley.j.thomas@gmail.com',
     description='A Mixed Reality ROS2 Package',
     license='Apache-2.0',
