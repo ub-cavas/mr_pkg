@@ -1,24 +1,24 @@
 import rclpy
 from rclpy.node import Node
-
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
-
 import cv2
 import numpy as np
+
+VIRTUAL_CAMERA_TOPIC = '/virtual_camera/image_raw/compressed'
+PHYSICAL_CAMERA_TOPIC = '/webcam/image_raw'
+MERGED_IMAGE_TOPIC = '/mixed_reality/camera'
+MERGED_FRAME_RATE = 30  # Hz
 
 class ImageOverlayNode(Node):
     def __init__(self):
         super().__init__('image_overlay_node')
         self.bridge = CvBridge()
-
         self.raw_image = None
         self.compressed_image = None
-
-        self.raw_sub = self.create_subscription(Image, '/webcam/image_raw', self.raw_callback, 10)
-        self.compressed_sub = self.create_subscription(CompressedImage, '/virtual_camera/image_raw/compressed', self.compressed_callback, 10)
-
-        self.pub = self.create_publisher(Image, '/mixed_reality/camera', 30)
+        self.raw_sub = self.create_subscription(Image, PHYSICAL_CAMERA_TOPIC, self.raw_callback, 10)
+        self.compressed_sub = self.create_subscription(CompressedImage, VIRTUAL_CAMERA_TOPIC, self.compressed_callback, 10)
+        self.pub = self.create_publisher(Image, MERGED_IMAGE_TOPIC, MERGED_FRAME_RATE)
 
     def raw_callback(self, msg):
         try:
@@ -64,7 +64,6 @@ class ImageOverlayNode(Node):
 
         # Convert back to BGR for publishing
         blended_bgr = cv2.cvtColor(blended, cv2.COLOR_BGRA2BGR)
-
         try:
             msg = self.bridge.cv2_to_imgmsg(blended_bgr, encoding='bgr8')
             self.pub.publish(msg)
