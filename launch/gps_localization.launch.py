@@ -26,38 +26,48 @@ def generate_launch_description():
             default_value='true',
             description='Automatically start nodes'
         ),
+
+        # tf_tree (placeholder until we get this info from the vehicle)
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='static_transform_imu',
+            arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'imu_link']
+        ),
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='base_to_gps_tf',
+            arguments=['0.5', '0.0', '0.8', '0.0', '0.0', '0.0', 'base_link', 'gps']
+        ),
+        # Map to odom transform (static for now)
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom'],
+            name='map_to_odom_tf'
+        ),
         
-        # EKF node for continuous odometry
+        
+        
+        # EKF node
         Node(
             package='robot_localization',
             executable='ekf_node',
-            name='ekf_filter_node_odom',
+            name='ekf_filter_node',
             output='screen',
-            parameters=[ekf_config, {'use_sim_time': use_sim_time}],
-            remappings=[('odometry/filtered', 'odometry/local')]
+            parameters=[ekf_config]
         ),
-        
-        # EKF node for map frame (with GPS)
-        Node(
-            package='robot_localization',
-            executable='ekf_node', 
-            name='ekf_filter_node_map',
-            output='screen',
-            parameters=[ekf_config, {'use_sim_time': use_sim_time}],
-            remappings=[('odometry/filtered', 'odometry/global')]
-        ),
-        
-        # NavSat transform node
+        # Navsat transform node
         Node(
             package='robot_localization',
             executable='navsat_transform_node',
             name='navsat_transform',
             output='screen',
-            parameters=[navsat_config, {'use_sim_time': use_sim_time}],
+            parameters=[navsat_config],
             remappings=[
                 ('imu/data', '/novatel/oem7/imu/data'),
                 ('gps/fix', '/novatel/oem7/fix'),
-                ('odometry/filtered', 'odometry/local')
             ]
-        )
+        ),
     ])
