@@ -48,16 +48,6 @@ def generate_launch_description():
             name='map_to_odom_tf'
         ),
         
-        
-        
-        # EKF node
-        Node(
-            package='robot_localization',
-            executable='ekf_node',
-            name='ekf_filter_node',
-            output='screen',
-            parameters=[ekf_config]
-        ),
         # Navsat transform node
         Node(
             package='robot_localization',
@@ -66,8 +56,17 @@ def generate_launch_description():
             output='screen',
             parameters=[navsat_config],
             remappings=[
-                ('imu/data', '/novatel/oem7/imu/data'),
-                ('gps/fix', '/novatel/oem7/fix'),
+                ('imu', '/novatel/oem7/imu/data'),
+                ('gps/fix', '/novatel/oem7/fix')
             ]
         ),
+        
+        # EKF node
+        Node(
+            package='robot_localization',
+            executable='ekf_node',
+            name='ekf_filter_node',
+            output='screen',
+            parameters=[ekf_config]
+        )
     ])
