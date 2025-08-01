@@ -22,7 +22,7 @@ import launch.actions
 
 def generate_launch_description():
     gps_wpf_dir = get_package_share_directory(
-        "dual_ekf")
+        "mr_pkg")
     rl_params_file = os.path.join(
         gps_wpf_dir, "config", "dual_ekf_params.yaml")
 
@@ -32,7 +32,7 @@ def generate_launch_description():
                 "output_final_position", default_value="false"
             ),
             launch.actions.DeclareLaunchArgument(
-                "output_location", default_value="~/dual_ekf_example_debug.txt"
+                "output_location", default_value="~/mr_pkg_example_debug.txt"
             ),
             launch_ros.actions.Node(
                 package='tf2_ros',
