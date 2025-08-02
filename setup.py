@@ -14,10 +14,11 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
         (os.path.join('share', package_name, 'config'), glob('config/*')),
+
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='oakley',
+    maintainer='oakley thomas',
     maintainer_email='oakley.j.thomas@gmail.com',
     description='A Mixed Reality ROS2 Package',
     license='Apache-2.0',
@@ -26,7 +27,9 @@ setup(
         'console_scripts': [
             'world_transform = mr_pkg.world_transformation:main',
             'dual_ekf = dual_ekf.launch.dual_ekf_navsat:generate_launch_description',
-            'virtual_perception = mr_pkg.virtual_perception:main'
+            'virtual_perception = mr_pkg.virtual_perception:main',
+            'webcam_publisher = mr_pkg.webcam_publisher:main',
+            'image_overlay = mr_pkg.image_overlay:main'
         ],
     },
 )
