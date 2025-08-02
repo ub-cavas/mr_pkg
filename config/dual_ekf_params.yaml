@@ -122,13 +122,16 @@ navsat_transform:
     imu_topic: /novatel/oem7/imu/data
     odom_topic: /novatel/oem7/odom
 
+    wait_for_datum: true
     frequency: 30.0
     delay: 1.0
     magnetic_declination_radians: 0.0
     yaw_offset: 0.0
-    zero_altitude: false
-    broadcast_cartesian_transform: true
     publish_filtered_gps: true
     use_odometry_yaw: false
-    wait_for_datum: true
-    datum: [42.99260747, -78.79737954, 0.0]
+    zero_altitude: true
+    broadcast_cartesian_transform: true
+    
+    
+    
+    

@@ -3,6 +3,8 @@ from rclpy.node import Node
 from sensor_msgs.msg import NavSatFix
 from geometry_msgs.msg import Point
 from nav_msgs.msg import Odometry
+from robot_localization.srv import SetDatum
+from geographic_msgs.msg import GeoPose
 
 class WorldTransformation(Node):
     def __init__(self):
@@ -10,7 +12,7 @@ class WorldTransformation(Node):
         
         self.ego_vehicle_odom_subscriber = self.create_subscription(
             Odometry, 
-            '/odometry/local', 
+            '/odometry/global', 
             self.on_ego_vehicle_odom_received,
             10)
         
@@ -22,13 +24,9 @@ class WorldTransformation(Node):
         newMsg.header.stamp = self.get_clock().now().to_msg()
         newMsg.header.frame_id = 'odom'           # world frame
         newMsg.child_frame_id = 'base_link'       # robot frame   
-        newMsg.pose.pose.position.x = msg.pose.pose.position.z
-        newMsg.pose.pose.position.y = msg.pose.pose.position.y
-        newMsg.pose.pose.position.z = msg.pose.pose.position.x
+        newMsg.pose.pose = msg.pose.pose
         self.ego_vehicle_publisher.publish(newMsg)
-        
-         
-
+    
 
 # ------------ Engine ------------------
 def main(args=None):
