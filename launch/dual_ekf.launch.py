@@ -38,20 +38,24 @@ def generate_launch_description():
                 package='tf2_ros',
                 executable='static_transform_publisher',
                 name='static_transform_imu',
-                arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'imu_link']
+                # arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'imu_link']
+                arguments=['0.8', '0', '1.7', '0', '0', '0', 'base_link', 'imu_link'],
+                parameters=[{"use_sim_time": True}],
             ),
             launch_ros.actions.Node(
                 package='tf2_ros',
                 executable='static_transform_publisher',
                 name='static_transform_gps',
-                arguments=['0.5', '0.0', '0.8', '0.0', '0.0', '0.0', 'base_link', 'gps']
+                # arguments=['0.5', '0.0', '0.8', '0.0', '0.0', '0.0', 'base_link', 'gps']
+                arguments=['0.8', '0.0', '1.8', '0.0', '0.0', '0.0', 'base_link', 'gnss_link'],
+                parameters=[{"use_sim_time": True}],
             ),
-            launch_ros.actions.Node(
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                name='static_transform_map',
-                arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'map', 'base_link']
-            ),
+            # launch_ros.actions.Node(
+            #     package='tf2_ros',
+            #     executable='static_transform_publisher',
+            #     name='static_transform_map',
+            #     arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'map', 'base_link']
+            # ),
             launch_ros.actions.Node(
                 package="robot_localization",
                 executable="ekf_node",
@@ -76,11 +80,11 @@ def generate_launch_description():
                 output="screen",
                 parameters=[
                     rl_params_file,
-                    #{"use_sim_time": True}
+                    # {"use_sim_time": True}
                 ],
                 remappings=[
-                    ("imu/data", "/novatel/oem7/imu/data"),
-                    ("gps/fix", "/novatel/oem7/fix"),
+                    ("imu/data", "/sensing/gnss/novatel/oem7/imu/data"),
+                    ("gps/fix", "/sensing/gnss/novatel/oem7/fix"),
                     ("gps/filtered", "gps/filtered"),
                     ("odometry/gps", "odometry/gps"),
                     ("odometry/filtered", "odometry/global"),
