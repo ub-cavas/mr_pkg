@@ -18,8 +18,15 @@ class ImageOverlayNode(Node):
         # Store the latest compressed image
         self.latest_compressed_image = None
         
-        # Black pixel threshold (pixels with all RGB values below this are considered black)
-        self.black_threshold = 10
+        # Mask color: R=255 G=163 B=0 (in BGR format for OpenCV: B=0 G=163 R=255)
+        bright_pink_bgr = np.array([147, 20, 255])  # BGR format
+        # For masking, you typically want a range:
+        lower_pink = np.array([140, 10, 240])  # Lower bound
+        upper_pink = np.array([154, 30, 255])  # Upper bound
+
+        self.mask_color_bgr = bright_pink_bgr
+        # Tolerance for color matching (allows for slight variations)
+        self.color_tolerance = 180
         
         # Subscribers
         self.image_sub = self.create_subscription(
@@ -44,7 +51,7 @@ class ImageOverlayNode(Node):
         )
         
         self.get_logger().info('Image Overlay Node initialized')
-        self.get_logger().info(f'Black pixel threshold set to: {self.black_threshold}')
+        self.get_logger().info(f'Mask color (BGR): {self.mask_color_bgr} with tolerance: {self.color_tolerance}')
     
     def compressed_image_callback(self, msg):
         """Store the latest compressed image"""
@@ -82,12 +89,16 @@ class ImageOverlayNode(Node):
             # Create overlay image starting with base image
             merged_image = base_image.copy()
             
-            # Create mask for non-black pixels in compressed image
-            # Pixels are considered black if all BGR values are below threshold
-            mask = np.all(scaled_compressed <= self.black_threshold, axis=2)
+            # Create mask for pixels that match the specified color (R=255 G=163 B=0)
+            # Calculate color distance for each pixel
+            color_diff = np.abs(scaled_compressed.astype(np.float32) - self.mask_color_bgr.astype(np.float32))
+            color_distance = np.sqrt(np.sum(color_diff ** 2, axis=2))
             
-            # Invert mask - we want to overlay non-black pixels
-            overlay_mask = ~mask
+            # Pixels within tolerance of the mask color should be transparent
+            mask_pixels = color_distance <= self.color_tolerance
+            
+            # Invert mask - we want to overlay pixels that are NOT the mask color
+            overlay_mask = ~mask_pixels
             
             # Apply overlay where mask is True (non-black pixels)
             merged_image[overlay_mask] = scaled_compressed[overlay_mask]
