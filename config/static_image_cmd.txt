@@ -1,0 +1,1 @@
+ros2 run mr_pkg static_image_publisher --ros-args -p image_path:=images/frame1_04_27.jpg
