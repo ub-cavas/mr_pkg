@@ -21,7 +21,7 @@ class WorldTransformation(Node):
     # ----------- ROS2 Callbacks------------------
     def on_ego_vehicle_odom_received(self, msg: Odometry):
         newMsg = Odometry()
-        newMsg.header.stamp = self.get_clock().now().to_msg()
+        newMsg.header.stamp = msg.header.stamp
         newMsg.header.frame_id = 'odom'           # world frame
         newMsg.child_frame_id = 'base_link'       # robot frame   
         newMsg.pose.pose = msg.pose.pose
