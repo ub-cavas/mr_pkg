@@ -3,16 +3,11 @@ import os
 import threading
 import time
 import uuid
-
 import redis
+from mr_pkg.modules.logger import Logger
 
 
 module_name = os.path.splitext(os.path.basename(__file__))[0]
-
-if __name__ == module_name:
-    from logger import Logger
-else:
-    from modules.logger import Logger
 
 
 class Telemetry:

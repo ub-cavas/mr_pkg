@@ -1,17 +1,20 @@
+#!/usr/bin/env python3
+
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
 import atexit
 import time
-
-if __name__ == "__main__":
-    from telemetry import Telemetry
-else:
-    from modules.telemetry import Telemetry
+import math
+import json
+import os
+from mr_pkg.modules.telemetry import Telemetry
+from ament_index_python.packages import get_package_share_directory
 
 class AutowareVehicle(Node):
-
     def __init__(self, agent_id):
+        super().__init__('Autoware_Vehicle_Telemetry')
+
         self.ego_vehicle_odom_subscriber = self.create_subscription(
             Odometry, 
             '/world_transform', 
@@ -28,7 +31,15 @@ class AutowareVehicle(Node):
         atexit.register(self.autoware_vehicle_telemetry.shutdown)
 
     def on_ego_vehicle_odom_received(self, msg: Odometry):
-        print(f"Received odom: {msg}")
+        self.x = msg.pose.pose.position.x
+        self.y = msg.pose.pose.position.y
+        self.z = msg.pose.pose.position.z
+        # Yaw extraction from quaternion
+        # Yaw (rotation around Z axis)
+        quat = msg.pose.pose.orientation
+        siny_cosp = 2.0 * (quat.w * quat.z + quat.x * quat.y)
+        cosy_cosp = 1.0 - 2.0 * (quat.y * quat.y + quat.z * quat.z)
+        self.yaw = math.degrees(math.atan2(siny_cosp, cosy_cosp))
 
     def shutdown(self):
         self.autoware_vehicle_telemetry.shutdown()
@@ -52,18 +63,34 @@ class AutowareVehicleTelemetry(Telemetry):
 
     def handle_fetch_telemetry_data(self):
         """ Callback function to fetch the telemetry data to be sent to other agents.
-        Return a dictionary with the telemetry data. """
+        Return a dictionary with the telemetry data. Convert to Unreal Engine Coordinates first"""
         return  {
             "location":{
                 "x": self.aw_vehicle.x,
-                "y": self.aw_vehicle.y,
+                "y": -self.aw_vehicle.y,
                 "z": self.aw_vehicle.z
             },
             "yaw": self.aw_vehicle.yaw,
-            "blueprint": hero_vehicle.attributes.get("ros_name", self.DEFAULT_BLUEPRINT),
-            "color": hero_vehicle.attributes.get("color", self.DEFAULT_VEHICLE_COLOR)
+            "blueprint": "vehicle.lincoln.mkz_2020",
+            "color": "255, 255, 255"
         }
-        pass
+    
+    def _load_redis_config(self):
+        pkg_share = get_package_share_directory('mr_pkg')
+        config_path = os.path.join(pkg_share, "config", self.CONFIG_FILE)
+
+        try:
+            with open(config_path, "r") as file:
+                config = json.load(file)
+
+                self.HOST = config.get("host", self.DEFAULT_HOST)
+                self.PORT = config.get("port", self.DEFAULT_PORT)
+                self.PASSWORD = config.get("password", self.DEFAULT_PASSWORD)
+                self.CHANNEL = config.get("channel", self.DEFAULT_CHANNEL)
+
+        except Exception as e:
+            raise RuntimeError(f"[!] Error loading telemetry config file: {e}") from e
+            
 
     def on_receive_conn_destroy(self, agent_id):
         """ Callback function to clean up when an agent disconnects, you'll get the id of the agent that disconnected. """
@@ -88,7 +115,7 @@ class AutowareVehicleTelemetry(Telemetry):
 # ------------ Engine ------------------
 def main(args=None):
     rclpy.init(args=args)
-    autoware_vehicle = AutowareVehicle()
+    autoware_vehicle = AutowareVehicle("UB_autoware_lincoln")
     rclpy.spin(autoware_vehicle)
     autoware_vehicle.destroy_node()
 

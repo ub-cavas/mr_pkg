@@ -29,7 +29,8 @@ setup(
             'dual_ekf = dual_ekf.launch.dual_ekf_navsat:generate_launch_description',
             'virtual_perception = mr_pkg.virtual_perception:main',
             'webcam_publisher = mr_pkg.webcam_publisher:main',
-            'image_overlay = mr_pkg.image_overlay:main'
+            'image_overlay = mr_pkg.image_overlay:main',
+            'aw_vehicle_telemetry = mr_pkg.modules.aw_vehicle_telemetry:main',
         ],
     },
 )
