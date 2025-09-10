@@ -31,6 +31,7 @@ setup(
             'webcam_publisher = mr_pkg.webcam_publisher:main',
             'image_overlay = mr_pkg.image_overlay:main',
             'aw_vehicle_telemetry = mr_pkg.modules.aw_vehicle_telemetry:main',
+            'mr_telemetry = mr_pkg.modules.mr_telemetry:main',
         ],
     },
 )
