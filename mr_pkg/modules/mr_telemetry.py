@@ -9,7 +9,7 @@ import os
 class TrafficAgent:
     def __init__(self, id, location, yaw, blueprint, color):
         self.id = id
-        self.position = location
+        self.location = location
         self.yaw = yaw
         self.blueprint = blueprint
         self.color = color
@@ -23,20 +23,20 @@ class MrTelemetry(Telemetry):
             self.vehicles = {}
 
     def on_receive_telemetry(self, parsed_message):
-        id = parsed_message["id"]
+        agent_id = parsed_message["id"]
         bp = parsed_message["blueprint"]
         color = parsed_message["color"]
         position = parsed_message["location"]
         yaw = parsed_message["yaw"]
 
-        if id not in self.vehicles:
-            self.vehicles[id] = TrafficAgent(id, position, yaw, bp, color).__dict__
-        elif self._has_other_vehicle_changed(id, bp, color):
-            del self.vehicles[id]
-            self.vehicles[id] = TrafficAgent(id, position, yaw, bp, color).__dict__
+        if agent_id not in self.vehicles:
+            self.vehicles[agent_id] = TrafficAgent(agent_id, position, yaw, bp, color).__dict__
+        elif self._has_other_vehicle_changed(agent_id, bp, color):
+            del self.vehicles[agent_id]
+            self.vehicles[agent_id] = TrafficAgent(agent_id, position, yaw, bp, color).__dict__
         else:
-            self.vehicles[id].location = position
-            self.vehicles[id].yaw = yaw
+            self.vehicles[agent_id].location = position
+            self.vehicles[agent_id].yaw = yaw
         
         self.send_traffic_data(self.vehicles)
 
@@ -60,8 +60,7 @@ class MrTelemetry(Telemetry):
         
     def on_receive_conn_destroy(self, agent_id):
         """ Callback function to clean up when an agent disconnects, you'll get the id of the agent that disconnected. """
-        # TODO: Send a message to Unity to remove the vehicle
-        pass  
+        del self.vehicles[agent_id]
 
     def pack_vehicle_message(id, location, yaw):
         """ Convert from Unreal Engine coordinates to Unity coordinates. """
@@ -74,10 +73,9 @@ class MrTelemetry(Telemetry):
     
     def pack_new_vehicle_message(id, location, yaw, blueprint, color):
         vehicle_msg = self.pack_vehicle_message(id, location, yaw)
+        vehicle_msg["id"] = id
         vehicle_msg["blueprint"] = blueprint
         vehicle_msg["color"] = color
-        vehicle_msg["id"] = id
-        vehicle_msg["is_new"] = True
         return vehicle_msg
 
     def start(self):
