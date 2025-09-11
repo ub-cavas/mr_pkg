@@ -31,15 +31,23 @@ class AutowareVehicle(Node):
         atexit.register(self.autoware_vehicle_telemetry.shutdown)
 
     def on_ego_vehicle_odom_received(self, msg: Odometry):
-        self.x = msg.pose.pose.position.x
-        self.y = msg.pose.pose.position.y
-        self.z = msg.pose.pose.position.z
-        # Yaw extraction from quaternion
-        # Yaw (rotation around Z axis)
-        quat = msg.pose.pose.orientation
-        siny_cosp = 2.0 * (quat.w * quat.z + quat.x * quat.y)
-        cosy_cosp = 1.0 - 2.0 * (quat.y * quat.y + quat.z * quat.z)
-        self.yaw = math.degrees(math.atan2(siny_cosp, cosy_cosp))
+
+        def set_position():
+            self.x = msg.pose.pose.position.x * 100.0,    # Forward (meters to cm)
+            self.y = -msg.pose.pose.position.y * 100.0,   
+            self.z = msg.pose.pose.position * 100.0  
+
+        def set_orientation():   
+            # Yaw extraction from quaternion
+            x = msg.pose.pose.orientationx
+            y = msg.pose.pose.orientation.y  
+            z = msg.pose.pose.orientation.z
+            w = msg.pose.pose.orientation.w
+            self.yaw = math.degrees(math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z)))
+
+        # UPDATE TRANSFORMS
+        set_position()
+        set_orientation()
 
     def shutdown(self):
         self.autoware_vehicle_telemetry.shutdown()
