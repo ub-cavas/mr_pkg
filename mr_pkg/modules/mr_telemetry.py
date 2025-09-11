@@ -88,7 +88,6 @@ class MrTelemetry(Telemetry):
         self.sock.close()
 
 def main():
-    x = 0
     mr_telemetry = MrTelemetry()
     mr_telemetry.start()
     atexit.register(mr_telemetry.shutdown)

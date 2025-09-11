@@ -38,7 +38,6 @@ def generate_launch_description():
                 package='tf2_ros',
                 executable='static_transform_publisher',
                 name='static_transform_imu',
-                # arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'imu_link']
                 arguments=['0.8', '0', '1.7', '0', '0', '0', 'base_link', 'imu_link'],
                 parameters=[{"use_sim_time": True}],
             ),
@@ -50,12 +49,6 @@ def generate_launch_description():
                 arguments=['0.8', '0.0', '1.8', '0.0', '0.0', '0.0', 'base_link', 'gnss_link'],
                 parameters=[{"use_sim_time": True}],
             ),
-            # launch_ros.actions.Node(
-            #     package='tf2_ros',
-            #     executable='static_transform_publisher',
-            #     name='static_transform_map',
-            #     arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'map', 'base_link']
-            # ),
             launch_ros.actions.Node(
                 package="robot_localization",
                 executable="ekf_node",
