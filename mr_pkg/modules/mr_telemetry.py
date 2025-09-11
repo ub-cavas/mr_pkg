@@ -87,30 +87,41 @@ class MrTelemetry(Telemetry):
     def close(self):
         self.sock.close()
 
-
-
-
-# -------------Example usage------------------
 def main():
+    x = 0
     mr_telemetry = MrTelemetry()
     mr_telemetry.start()
     atexit.register(mr_telemetry.shutdown)
-    while (True):
+    try:
+        while True:
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        print("[x] Keyboard interrupt")
+
+    finally:
+        mr_telemetry.shutdown()
+
+if __name__ == '__main__':
+    main()
+
+# -------------Example usage------------------
+    """while (True):
         mr_telemetry.vehicles = {
             "agent_001": {
-                "location": {"x": 10.0, "y": 0.0, "z": 5.0},
+                "location": {"x": 10.0 + x, "y": 0.0, "z": 5.0},
                 "yaw": 90.0,
                 "blueprint": "vehicle.lincoln.mkz_2020",
                 "color": "255, 0, 0"
             },
             "agent_002": {
-                "location": {"x": -5.0, "y": 0.0, "z": 10.0},
+                "location": {"x": -5.0 + x, "y": 0.0, "z": 10.0},
                 "yaw": 180.0,
                 "blueprint": "vehicle.tesla.model3",
                 "color": "0, 255, 0"
             },
             "agent_003": {
-                "location": {"x": 0.0, "y": 0.0, "z": -8.0},
+                "location": {"x": 0.0 + x, "y": 0.0, "z": -8.0},
                 "yaw": 45.0,
                 "blueprint": "vehicle.bmw.grandtourer",
                 "color": "0, 0, 255"
@@ -119,6 +130,6 @@ def main():
         mr_telemetry.send_traffic_data()
         print("Sent telemetry data")
         time.sleep(0.1)
+        x += 0.05"""
 
-if __name__ == '__main__':
-    main()
+
