@@ -38,7 +38,7 @@ class MrTelemetry(Telemetry):
             self.vehicles[agent_id].location = position
             self.vehicles[agent_id].yaw = yaw
         
-        self.send_traffic_data(self.vehicles)
+        self.send_traffic_data()
 
     def _has_other_vehicle_changed(self, id, bp, color):
         vehicle = self.vehicles[id]
