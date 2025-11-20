@@ -83,7 +83,7 @@ def generate_launch_description():
                 output="screen",
                 parameters=[
                     rl_params_file,
-                    # {"use_sim_time": True}
+                    {"use_sim_time": True}
                 ],
                 remappings=[
                     ("imu/data", "/sensing/gnss/novatel/oem7/imu/data"),
@@ -92,15 +92,6 @@ def generate_launch_description():
                     ("odometry/gps", "odometry/gps"),
                     ("odometry/filtered", "odometry/global"),
                 ],
-            ),
-
-            # Unity Communication
-            launch_ros.actions.Node(
-                package='mr_pkg',
-                executable='world_transform',
-                name='world_transformation_node',
-                output='screen',
-                parameters=[],
-            ),
+            )
         ]
     )

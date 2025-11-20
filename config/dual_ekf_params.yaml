@@ -7,7 +7,7 @@ ekf_filter_node_odom:
     print_diagnostics: true
     debug: true
     publish_tf: true
-    reset_on_time_jump: false
+    reset_on_time_jump: true
 
     map_frame: map
     odom_frame: odom
@@ -63,7 +63,7 @@ ekf_filter_node_map:
     print_diagnostics: true
     debug: true
     publish_tf: true
-    reset_on_time_jump: false
+    reset_on_time_jump: true
 
     map_frame: map
     odom_frame: odom
@@ -132,5 +132,6 @@ navsat_transform:
     yaw_offset: 0.0
     publish_filtered_gps: true
     use_odometry_yaw: false
-    zero_altitude: true
+    zero_altitude: false
     broadcast_cartesian_transform: true
+    reset_on_time_jump: true
