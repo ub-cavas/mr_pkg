@@ -14,4 +14,4 @@ Start the package `ros2 launch mr_pkg localization.py`
 
 Step 4:
 
-Start the Unity Pakage: TODO
+Start the Unity Package: TODO
