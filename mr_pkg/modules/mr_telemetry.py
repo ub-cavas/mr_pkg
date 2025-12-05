@@ -2,9 +2,17 @@ import socket
 import json
 import atexit
 import time
+import threading
+import os
+
 from ament_index_python.packages import get_package_share_directory
 from mr_pkg.modules.telemetry import Telemetry
-import os
+
+import carla
+
+CARLA_HOST = "localhost"
+CARLA_PORT = 2000
+CARLA_TIMEOUT = 10.0
 
 class TrafficAgent:
     def __init__(self, id, location, yaw, blueprint, color):
@@ -13,6 +21,15 @@ class TrafficAgent:
         self.yaw = yaw
         self.blueprint = blueprint
         self.color = color
+    
+    def to_dict(self):
+        return{
+            "id": self.id,
+            "location": self.location,
+            "yaw": self.yaw,
+            "blueprint": self.blueprint,
+            "color": self.color
+        }
 
 class MrTelemetry(Telemetry):
     def __init__(self):
@@ -22,21 +39,89 @@ class MrTelemetry(Telemetry):
             self._is_running = False
             self.vehicles = {}
 
-    def on_receive_telemetry(self, parsed_message):
-        agent_id = parsed_message["id"]
-        bp = parsed_message["blueprint"]
-        color = parsed_message["color"]
-        position = parsed_message["location"]
-        yaw = parsed_message["yaw"]
+            self._vehicles_lock = threading.lock() #Lock to avoid race
 
-        if agent_id not in self.vehicles:
-            self.vehicles[agent_id] = TrafficAgent(agent_id, position, yaw, bp, color).__dict__
-        elif self._has_other_vehicle_changed(agent_id, bp, color):
-            del self.vehicles[agent_id]
-            self.vehicles[agent_id] = TrafficAgent(agent_id, position, yaw, bp, color).__dict__
-        else:
-            self.vehicles[agent_id].location = position
-            self.vehicles[agent_id].yaw = yaw
+            self._connect_to_carla()
+
+    def _connect_to_carla(self):
+        if carla is None:
+            print('Module carla not found')
+        try:
+            client = carla.Client(CARLA_HOST, CARLA_PORT)
+            client.set_timeout(CARLA_TIMEOUT)
+            self.carla_client = client
+            self.carla_world = client.get_world()
+        except Exception as e:
+            self.carla_client = None
+            self.carla_world = None
+            print('Failed to connect to the simulator. Make sure the simulator is running and connected on localhost:2000')
+
+    def _collect_carla_traffic_data(self):
+        if self.carla_world is None: #If world is None, attempt to reconnect
+            self._connect_to_carla()
+            if self.carla_world is None:
+                return []
+        
+        try:
+            world = self.carla_world
+            actors = world.get_actors()
+            vehicles = actors.filter("vehicle.*")
+            walkers = actors.filter("walker.pedestrian.*")
+
+            items = []
+
+            for vehicle in vehicles:
+                try:
+                    bbox_rel = vehicle.bounding_box
+                    t = vehicle.get_transform()
+                    center_world = t.transform(bbox_rel.location)
+
+                    items.append({
+                        "actor_id": vehicle.id,
+                        "actor_type": "vehicle",
+                        "type_id": vehicle.type_id,
+                        "location": {"x": center_world.x, "y": center_world.y, "z": center_world.z},
+                        "rotation": {"roll": t.rotation.roll, "pitch": t.rotation.pitch, "yaw": t.rotation.yaw},
+                        "extent": {"x": bbox_rel.extent.x, "y": bbox_rel.extent.y, "z": bbox_rel.extent.z},
+                        "velocity": {"x": vehicle.get_velocity().x, "y": vehicle.get_velocity().y, "z": vehicle.get_velocity().z}
+                    })
+                except Exception:
+                    print("Failed to collect CARLA vehicle traffic data")
+
+            return items
+        except Exception:
+            print("Failed to collect CARLA traffic data")
+            return []
+
+
+    def on_receive_telemetry(self, parsed_message):
+        agent_id = parsed_message.get("id")
+        bp = parsed_message.get("blueprint")
+        color = parsed_message.get("color")
+        position = parsed_message.get("location")
+        yaw = parsed_message.get("yaw")
+
+        with self._vehicles_lock:
+            if agent_id not in self.vehicles:
+                self.vehicles[agent_id] = {
+                   "location": position,
+                    "yaw": yaw,
+                    "blueprint": bp,
+                    "color": color 
+                }
+            else:
+                vehicle = self.vehicles[agent_id]
+                changed = (vehicle.get("blueprint") != bp) or (vehicle.get("color") != color)
+                if changed:
+                    self.vehicles[agent_id] = {
+                        "location": position,
+                        "yaw": yaw,
+                        "blueprint": bp,
+                        "color": color
+                    }
+                else:
+                    vehicle["location"] = position
+                    vehicle["yaw"] = yaw
         
         self.send_traffic_data()
 
@@ -74,6 +159,23 @@ class MrTelemetry(Telemetry):
         if self._is_running:
             self.stop_telemetry_services()
             self._is_running = False
+
+    def handle_fetch_telemetry_data(self):
+        with self._vehicles_lock: #Grab lock to avoid race
+            vehicles_snapshot = dict(self.vehicles)
+        
+        try:
+            traffic = self._collect_carla_traffic_data()
+        except Exception:
+            traffic = []
+            print("_collect_carla_actors failed")
+        
+        payload = {
+            "vehicles": vehicles_snapshot,
+            "traffic": traffic
+        }
+
+        return payload
 
     def send_traffic_data(self):
         try:
