@@ -39,7 +39,7 @@ class MrTelemetry(Telemetry):
             self._is_running = False
             self.vehicles = {}
 
-            self._vehicles_lock = threading.lock() #Lock to avoid race
+            self._vehicles_lock = threading.Lock() #Lock to avoid race
 
             self._connect_to_carla()
 
