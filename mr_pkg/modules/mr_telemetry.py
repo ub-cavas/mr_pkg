@@ -122,8 +122,6 @@ class MrTelemetry(Telemetry):
                 else:
                     vehicle["location"] = position
                     vehicle["yaw"] = yaw
-        
-        self.send_traffic_data()
 
     def _has_other_vehicle_changed(self, id, bp, color):
         vehicle = self.vehicles[id]
@@ -175,16 +173,18 @@ class MrTelemetry(Telemetry):
             "traffic": traffic
         }
 
+        self.send_data_over_udp(payload)
+
         return payload
 
-    def send_traffic_data(self):
+    def send_data_over_udp(self, payload):
         try:
             # Serialize dictionary to JSON
-            json_data = json.dumps(self.vehicles)
+            json_data = json.dumps(payload)
             # Send as bytes
             self.sock.sendto(json_data.encode('utf-8'), self.address)
         except Exception as e:
-            print(f"Error sending data: {e}")
+            print(f"Error sending data over UDP: {e}")
 
     def close(self):
         self.sock.close()
