@@ -26,6 +26,7 @@ setup(
     entry_points={
         'console_scripts': [
             'world_transform = mr_pkg.world_transformation:main',
+            'kinematic_state_receiver = mr_pkg.kinematic_state_receiver:main',
         ],
     },
 )
