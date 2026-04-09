@@ -26,7 +26,6 @@ setup(
     entry_points={
         'console_scripts': [
             'world_transform = mr_pkg.world_transformation:main',
-            'dual_ekf = dual_ekf.launch.dual_ekf_navsat:generate_launch_description'
         ],
     },
 )
