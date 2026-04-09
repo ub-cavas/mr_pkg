@@ -12,7 +12,7 @@ class WorldTransformation(Node):
             self.on_ego_vehicle_odom_received,
             10)
         
-        self.ego_vehicle_publisher = self.create_publisher(Odometry, '/world_transform', 10)
+        self.ego_vehicle_publisher = self.create_publisher(Odometry, '/ub_mr/localization', 10)
 
     # ----------- ROS2 Callbacks------------------
     def on_ego_vehicle_odom_received(self, msg: Odometry):
