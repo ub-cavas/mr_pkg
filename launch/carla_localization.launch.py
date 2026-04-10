@@ -27,8 +27,8 @@ def generate_launch_description():
             ),
             launch_ros.actions.Node(
                 package='mr_pkg',
-                executable='autoware_localization',
-                name='autoware_localization_node',
+                executable='carla_localization',
+                name='carla_localization_node',
                 output='screen',
                 parameters=[],
             ),

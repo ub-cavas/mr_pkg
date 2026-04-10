@@ -4,14 +4,14 @@ from pyproj import Transformer, database
 from pyproj.aoi import AreaOfInterest
 from rclpy.node import Node
 
-ORIGIN_LATITUDE = 0.0
-ORIGIN_LONGITUDE = 0.0
+ORIGIN_LATITUDE = 42.9926180599693
+ORIGIN_LONGITUDE = -78.7924945927909
 MGRS_GRID_SIZE_METERS = 100000.0
 
 
-class KinematicStateReceiver(Node):
+class AutowareLocalization(Node):
     def __init__(self):
-        super().__init__('kinematic_state_receiver')
+        super().__init__('autoware_localization')
 
         self.declare_parameter('topic_name', '/localization/kinematic_state')
         self.topic_name = self.get_parameter(
@@ -69,6 +69,7 @@ class KinematicStateReceiver(Node):
         localization_msg.pose.pose = msg.pose.pose
         localization_msg.pose.pose.position.x = offset_x_meters
         localization_msg.pose.pose.position.y = offset_y_meters
+        localization_msg.pose.pose.position.z = 0.0
         localization_msg.twist = msg.twist
         localization_msg.pose.covariance = msg.pose.covariance
         localization_msg.twist.covariance = msg.twist.covariance
@@ -132,11 +133,11 @@ class KinematicStateReceiver(Node):
 
 
 def main(args=None):
-    print('Starting Kinematic State Receiver Node')
+    print('Starting Autoware Localization Node')
     rclpy.init(args=args)
-    kinematic_state_receiver = KinematicStateReceiver()
-    rclpy.spin(kinematic_state_receiver)
-    kinematic_state_receiver.destroy_node()
+    autoware_localization = AutowareLocalization()
+    rclpy.spin(autoware_localization)
+    autoware_localization.destroy_node()
     rclpy.shutdown()
 
 

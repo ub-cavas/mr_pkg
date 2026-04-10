@@ -97,8 +97,8 @@ def generate_launch_description():
             # Unity Communication
             launch_ros.actions.Node(
                 package='mr_pkg',
-                executable='world_transform',
-                name='world_transformation_node',
+                executable='dual_ekf_localization',
+                name='dual_ekf_world_transform_node',
                 output='screen',
                 parameters=[],
             ),
