@@ -12,7 +12,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
         (os.path.join('share', package_name, 'config'), glob('config/*')),
 
     ],
@@ -25,7 +25,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'world_transform = mr_pkg.world_transformation:main',
+            'dual_ekf_localization = mr_pkg.dual_ekf_localization:main',
+            'autoware_localization = mr_pkg.autoware_localization:main',
+            'carla_localization = mr_pkg.carla_localization:main',
         ],
     },
 )

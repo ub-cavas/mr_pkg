@@ -2,9 +2,10 @@ import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
 
-class WorldTransformation(Node):
+
+class DualEkfLocalization(Node):
     def __init__(self):
-        super().__init__('World_Transformation')
+        super().__init__('dual_ekf_world_transform')
         
         self.ego_vehicle_odom_subscriber = self.create_subscription(
             Odometry, 
@@ -26,11 +27,11 @@ class WorldTransformation(Node):
 
 # ------------ Engine ------------------
 def main(args=None):
-    print("Starting World_Transform Node")
+    print("Starting Dual EKF Localization Node")
     rclpy.init(args=args)
-    world_transformation = WorldTransformation()
-    rclpy.spin(world_transformation)
-    world_transformation.destroy_node()
+    dual_ekf_localization = DualEkfLocalization()
+    rclpy.spin(dual_ekf_localization)
+    dual_ekf_localization.destroy_node()
     rclpy.shutdown()
 
 if __name__ == '__main__':
